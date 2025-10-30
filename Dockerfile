@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy jar built by Gradle
-COPY build/libs/rating-vuz-0.0.1-SNAPSHOT.jar app.jar
+COPY build/libs/rating-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose port
 ENV PORT 8080
