@@ -69,5 +69,11 @@ public class BController {
     public List<BCalcDto> getCalcAll() {
         return service.getCalcAll();
     }
+
+    @DeleteMapping("/clear")
+    @Operation(summary = "Удалить все параметры и расчёты класса B")
+    public void clearAll() {
+        service.clearAll();
+    }
 }
 

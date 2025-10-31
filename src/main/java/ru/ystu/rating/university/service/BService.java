@@ -159,5 +159,11 @@ public class BService {
     }
 
     private double nz(Double v) { return v == null ? 0.0 : v; }
+
+    @Transactional
+    public void clearAll() {
+        calcRepo.deleteAll();
+        paramsRepo.deleteAll();
+    }
 }
 
