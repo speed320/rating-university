@@ -34,11 +34,11 @@ public class BService {
         for (BParamsDto d : bundle.data()) {
             var e = paramsRepo.findAllByYear(d.year()).stream().findFirst().orElseGet(BYearParams::new);
             e.setYear(d.year());
-            e.setENa(nz(d.ENa()));
-            e.setENb(nz(d.ENb()));
-            e.setENc(nz(d.ENc()));
-            e.setEb(nz(d.Eb()));
-            e.setEc(nz(d.Ec()));
+            e.setENa(nz(d.eNa()));
+            e.setENb(nz(d.eNb()));
+            e.setENc(nz(d.eNc()));
+            e.setEb(nz(d.eb()));
+            e.setEc(nz(d.ec()));
             e.setBeta121(nz(d.beta121()));
             e.setBeta122(nz(d.beta122()));
             e.setBeta131(nz(d.beta131()));
