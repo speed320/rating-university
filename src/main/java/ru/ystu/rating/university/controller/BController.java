@@ -11,7 +11,7 @@ import ru.ystu.rating.university.service.BService;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins="http://localhost:5173")
+@CrossOrigin(origins="https://rating-university-web.onrender.com")
 @RequestMapping("/api/b")
 @Tag(name = "Class B", description = "Параметры и расчёты класса B")
 public class BController {
