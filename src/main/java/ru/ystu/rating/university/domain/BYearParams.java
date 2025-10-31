@@ -11,11 +11,11 @@ public class BYearParams {
     private Long id;
     @Column(nullable = false) private Integer year;
     @Column(nullable = false) private Integer iteration = 1;
-    @Column(name = "e_na", nullable = false) private double eNa;
-    @Column(name = "e_nb", nullable = false) private double eNb;
-    @Column(name = "e_nc", nullable = false) private double eNc;
-    @Column(name = "eb", nullable = false) private double eb;
-    @Column(name = "ec", nullable = false) private double ec;
+    @Column(name = "ENa", nullable = false) private double eNa;
+    @Column(name = "ENb", nullable = false) private double eNb;
+    @Column(name = "ENc", nullable = false) private double eNc;
+    @Column(name = "Eb", nullable = false) private double eb;
+    @Column(name = "Ec", nullable = false) private double ec;
     @Column(nullable = false) private double beta121;
     @Column(nullable = false) private double beta122;
     @Column(nullable = false) private double beta131;
