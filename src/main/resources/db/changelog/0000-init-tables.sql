@@ -1,38 +1,86 @@
 --liquibase formatted sql
 --changeset sergey:0000_init_tables
 
-CREATE TABLE IF NOT EXISTS b_year_params (
-    id          BIGSERIAL PRIMARY KEY,
-
-    -- версия и статус
-    year        INTEGER NOT NULL,
-    iteration   INTEGER NOT NULL DEFAULT 1,
-    is_current  BOOLEAN NOT NULL DEFAULT TRUE,
-
-    -- параметры расчёта
-    e_na        DOUBLE PRECISION NOT NULL DEFAULT 0,
-    e_nb        DOUBLE PRECISION NOT NULL DEFAULT 0,
-    e_nc        DOUBLE PRECISION NOT NULL DEFAULT 0,
-    eb          DOUBLE PRECISION NOT NULL DEFAULT 0,
-    ec          DOUBLE PRECISION NOT NULL DEFAULT 0,
-
-    beta121     DOUBLE PRECISION NOT NULL DEFAULT 0,
-    beta122     DOUBLE PRECISION NOT NULL DEFAULT 0,
-    beta131     DOUBLE PRECISION NOT NULL DEFAULT 0,
-    beta132     DOUBLE PRECISION NOT NULL DEFAULT 0,
-    beta211     DOUBLE PRECISION NOT NULL DEFAULT 0,
-    beta212     DOUBLE PRECISION NOT NULL DEFAULT 0
+-- таблица классов
+CREATE TABLE IF NOT EXISTS classes (
+    id   BIGSERIAL PRIMARY KEY,
+    code VARCHAR(1) NOT NULL UNIQUE
 );
 
-CREATE TABLE IF NOT EXISTS b_year_calc (
-    id               BIGSERIAL PRIMARY KEY,
-    year             INTEGER       NOT NULL,
-    iteration        INTEGER       NOT NULL DEFAULT 1,
-    params_id        BIGINT        NULL,  -- ссылка на b_year_params.id (необязательно)
-    b11              DOUBLE PRECISION NOT NULL,
-    b12              DOUBLE PRECISION NOT NULL,
-    b13              DOUBLE PRECISION NOT NULL,
-    b21              DOUBLE PRECISION NOT NULL,
-    total_b          DOUBLE PRECISION NOT NULL,
-    calculated_at    TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP
+-- таблица ролей пользователей
+CREATE TABLE IF NOT EXISTS roles (
+    id   BIGSERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE
+);
+
+-- таблица пользователей
+CREATE TABLE IF NOT EXISTS app_user (
+    id            BIGSERIAL PRIMARY KEY,
+    name          VARCHAR(100) NOT NULL,
+    email         VARCHAR(90) NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    role_id       BIGINT NOT NULL,
+    last_active   TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+
+    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE RESTRICT
+);
+
+-- таблица текущей итерации пользователя
+CREATE TABLE IF NOT EXISTS user_iter_state (
+    id           BIGSERIAL PRIMARY KEY,
+    app_user_id  BIGINT NOT NULL,
+    current_iter INTEGER,
+
+    FOREIGN KEY (app_user_id) REFERENCES app_user(id) ON DELETE CASCADE,
+    CONSTRAINT uq_user_iter_state_user UNIQUE (app_user_id)
+);
+
+
+-- Данные передаваемые в запросе
+CREATE TABLE IF NOT EXISTS data (
+    id           BIGSERIAL PRIMARY KEY,
+    app_user_id  BIGINT NOT NULL,
+    class_id     BIGINT NOT NULL,
+    iter         INTEGER NOT NULL,
+    year_data    INTEGER NOT NULL,
+    created_at   TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+
+    FOREIGN KEY (app_user_id) REFERENCES app_user(id) ON DELETE CASCADE,
+    FOREIGN KEY (class_id)    REFERENCES classes(id)  ON DELETE CASCADE,
+
+    CONSTRAINT uq_data_user_class_year_iter UNIQUE (app_user_id, class_id, year_data, iter)
+);
+
+-- таблица вводимых параметров
+CREATE TABLE IF NOT EXISTS params_set (
+    id      BIGSERIAL PRIMARY KEY,
+    params  JSONB NOT NULL,
+    data_id BIGINT NOT NULL UNIQUE,
+
+    FOREIGN KEY (data_id) REFERENCES data(id) ON DELETE CASCADE,
+
+    CONSTRAINT ck_params_object CHECK (jsonb_typeof(params) = 'object')
+);
+
+-- таблица посчитанных параметров класса
+CREATE TABLE IF NOT EXISTS calc_result (
+    id          BIGSERIAL PRIMARY KEY,
+    calc_params JSONB NOT NUll,
+    data_id     BIGINT NOT NULL UNIQUE,
+
+    FOREIGN KEY (data_id) REFERENCES data(id) ON DELETE CASCADE,
+
+    CONSTRAINT ck_calc_object CHECK (jsonb_typeof(calc_params) = 'object')
+);
+
+-- таблица наименований метрик
+CREATE TABLE IF NOT EXISTS calc_result_name (
+    id             BIGSERIAL   PRIMARY KEY,
+    calc_result_id BIGINT NOT NULL UNIQUE,
+    code_b11       VARCHAR(50) NOT NULL DEFAULT 'B11',
+    code_b12       VARCHAR(50) NOT NULL DEFAULT 'B12',
+    code_b13       VARCHAR(50) NOT NULL DEFAULT 'B13',
+    code_b21       VARCHAR(50) NOT NULL DEFAULT 'B21',
+
+    FOREIGN KEY (calc_result_id) REFERENCES calc_result(id) ON DELETE CASCADE
 );

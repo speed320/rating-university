@@ -1,20 +1,19 @@
 --liquibase formatted sql
 --changeset sergey:0001_indexes
 
--- Композитный уникальный ключ (year + iteration)
-ALTER TABLE b_year_params
-    ADD CONSTRAINT uq_b_year_params_year_iteration UNIQUE (year, iteration);
+-- быстрые выборки по пользователю и итерации
+CREATE INDEX IF NOT EXISTS idx_data_user_iter ON data(app_user_id, iter);
 
--- Индекс для диапазонных выборок по годам
-CREATE INDEX IF NOT EXISTS idx_b_year_params_year
-    ON b_year_params (year);
+-- быстрые выборки по пользователю/классу/году/итерации
+CREATE INDEX IF NOT EXISTS idx_data_user_class_year_iter
+    ON data(app_user_id, class_id, year_data, iter);
 
--- Частичный уникальный индекс: только одна запись current на год
-CREATE UNIQUE INDEX IF NOT EXISTS uq_b_year_params_year_is_current_true
-    ON b_year_params (year)
-    WHERE is_current = TRUE;
+-- индекс на последнюю активность
+CREATE INDEX IF NOT EXISTS idx_app_user_last_active ON app_user(last_active);
 
-ALTER TABLE b_year_calc
-    ADD CONSTRAINT uq_b_year_calc_year_iteration UNIQUE (year, iteration);
+-- ускорение фильтров/поиска по атрибутам
+CREATE INDEX IF NOT EXISTS gin_params_set_params
+    ON params_set USING gin (params jsonb_path_ops);
 
-CREATE INDEX IF NOT EXISTS idx_b_year_calc_year ON b_year_calc(year);
+CREATE INDEX IF NOT EXISTS gin_calc_result_params
+    ON calc_result USING gin (calc_params jsonb_path_ops);
