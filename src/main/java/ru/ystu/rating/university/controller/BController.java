@@ -2,78 +2,91 @@ package ru.ystu.rating.university.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import ru.ystu.rating.university.dto.BCalcDto;
-import ru.ystu.rating.university.dto.BParamsBundle;
-import ru.ystu.rating.university.dto.BParamsDto;
+import org.springframework.web.server.ResponseStatusException;
+import ru.ystu.rating.university.dto.ClassCalcBlockDto;
+import ru.ystu.rating.university.dto.ClassParamsBlockDto;
+import ru.ystu.rating.university.dto.HistoryResponseDto;
+import ru.ystu.rating.university.dto.MetricNamesDto;
+import ru.ystu.rating.university.security.CustomUserDetails;
 import ru.ystu.rating.university.service.BService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/b")
-@Tag(name = "Class B", description = "Параметры и расчёты класса B")
+@Tag(
+        name = "Class B",
+        description = "Параметры и расчёты класса B (итерации, пользователи)"
+)
 public class BController {
 
-    private final BService service;
+    private final BService bService;
 
-    public BController(BService service) {
-        this.service = service;
+    public BController(BService bService) {
+        this.bService = bService;
     }
 
-    // Параметры — за год
-    @GetMapping("/params/{year}")
-    @Operation(summary = "Получить все введенные параметры за год (все итерации)")
-    public List<BParamsDto> getParamsByYear(@PathVariable int year) {
-        return service.getParamsByYear(year);
+    /**
+     * Получить последние введённые параметры класса B
+     * (последняя итерация для данного пользователя).
+     * <p>
+     * userId - SecurityContext,
+     */
+    @GetMapping("/params/last")
+    @Operation(summary = "Получить последние введённые параметры класса B (последняя итерация)")
+    public ClassParamsBlockDto getLastParamsForB(
+            @AuthenticationPrincipal CustomUserDetails principal
+    ) {
+        Long userId = principal.getId();
+        return bService.getLastParamsForB(userId);
     }
 
-    // Параметры — за все годы
-    @GetMapping("/params")
-    @Operation(summary = "Получить все введенные параметры за все года")
-    public List<BParamsDto> getParamsAll() {
-        return service.getParamsAll();
+    /**
+     * Получить рассчитанные значения по классу B за последнюю итерацию пользователя.
+     */
+    @GetMapping("/calc/last")
+    @Operation(summary = "Получить последние расчёты класса B (последняя итерация)")
+    public ClassCalcBlockDto getLastCalcForB(
+            @AuthenticationPrincipal CustomUserDetails principal
+    ) {
+        Long userId = principal.getId();
+        return bService.getLastCalcForB(userId);
     }
 
-    // Импорт
-    @PostMapping("/import")
-    @Operation(summary = "Импортировать параметры из JSON", description = "Структура: {\"class\":\"B\",\"data\":[ ... ]}")
-    public void importParams(@RequestBody BParamsBundle bundle) {
-        service.importBundle(bundle);
+    /**
+     * История по классу B: все итерации пользователя.
+     */
+    @GetMapping("/history")
+    @Operation(summary = "Получить историю расчётов класса B (все итерации)")
+    public HistoryResponseDto getHistoryForB(
+            @AuthenticationPrincipal CustomUserDetails principal
+    ) {
+        Long userId = principal.getId();
+        return bService.getHistoryForB(userId);
     }
 
-    // Экспорт
-    @GetMapping("/export")
-    @Operation(summary = "Экспортировать все параметры в JSON")
-    public BParamsBundle exportParams() {
-        return service.exportAll();
+    /**
+     * Обновление названий метрик для одного результата (B11/B12/B13/B21).
+     */
+    @PutMapping("/metric-names")
+    @Operation(summary = "Обновить названия метрик B11/B12/B13/B21 для конкретного результата")
+    public void updateMetricNames(@RequestBody MetricNamesDto dto) {
+        bService.updateMetricNames(dto);
     }
 
-    // Пересчёт по всем годам
-    @PostMapping("/calc")
-    @Operation(summary = "Пересчитать значения по всем годам и сохранить")
-    public List<BCalcDto> computeAll() {
-        return service.computeAllYears();
+    @GetMapping("/params/iter/{iter}")
+    @Operation(summary = "Получить введённые параметры класса B для заданной итерации")
+    public ClassParamsBlockDto getParamsForBIter(
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @PathVariable("iter") Integer iter
+    ) {
+        if (principal == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+
+        Long userId = principal.getId();
+        return bService.getParamsForBIter(userId, iter);
     }
 
-    // Получить рассчитанные значения за год
-    @GetMapping("/calc/{year}")
-    @Operation(summary = "Получить рассчитанные значения за год (последние сохранённые)")
-    public List<BCalcDto> getCalcByYear(@PathVariable int year) {
-        return service.getCalcByYear(year);
-    }
-
-    // Получить рассчитанные значения за все годы
-    @GetMapping("/calc")
-    @Operation(summary = "Получить рассчитанные значения за все годы (последние сохранённые)")
-    public List<BCalcDto> getCalcAll() {
-        return service.getCalcAll();
-    }
-
-    @DeleteMapping("/clear")
-    @Operation(summary = "Удалить все параметры и расчёты класса B")
-    public void clearAll() {
-        service.clearAll();
-    }
 }
-
