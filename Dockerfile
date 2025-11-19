@@ -1,25 +1,15 @@
-# Стадия сборки (Gradle собирает jar внутри контейнера)
-FROM gradle:8.10-jdk17-alpine AS builder
-
-WORKDIR /home/gradle/project
-
-# Копируем gradle-wrapper и конфиги
-COPY build.gradle settings.gradle gradlew gradle/ ./
-# Копируем исходники
-COPY src ./src
-
-# Собираем jar
-RUN ./gradlew clean bootJar --no-daemon
-
-# -------------------- Рантайм-слой --------------------
+# Use an official OpenJDK runtime as a parent image
 FROM eclipse-temurin:17-jre-jammy
 
+# Set working directory
 WORKDIR /app
 
-# Копируем собранный jar из стадии builder
-COPY --from=builder /home/gradle/project/build/libs/*.jar app.jar
+# Copy jar built by Gradle
+COPY build/libs/rating-0.0.1-SNAPSHOT.jar app.jar
 
-ENV PORT=8080
+# Expose port
+ENV PORT 8080
 EXPOSE 8080
 
+# Run the jar
 ENTRYPOINT ["java","-Dserver.port=${PORT}","-jar","/app/app.jar"]
