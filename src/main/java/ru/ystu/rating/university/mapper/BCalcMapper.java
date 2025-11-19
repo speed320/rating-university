@@ -43,7 +43,8 @@ public final class BCalcMapper {
      * @param json  JSONB calc_params как Map<String,Object>
      * @param names CalcResultName (может быть null, тогда подписи по умолчанию B11..B21)
      */
-    public static BCalcDto fromCalcJson(Integer year,
+    public static BCalcDto fromCalcJson(Long calcResultId,
+                                        Integer year,
                                         Integer iter,
                                         Map<String, Object> json,
                                         CalcResultName names) {
@@ -53,6 +54,7 @@ public final class BCalcMapper {
         String codeB21 = names != null ? names.getCodeB21() : "B21";
 
         return new BCalcDto(
+                calcResultId,
                 year,
                 iter,
                 getDouble(json, "B11"),

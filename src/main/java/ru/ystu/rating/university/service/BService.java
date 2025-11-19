@@ -180,7 +180,7 @@ public class BService {
                     if (cr == null) return null;
                     CalcResultName names = cr.getLabels();
                     Map<String, Object> json = cr.getCalcParams();
-                    return BCalcMapper.fromCalcJson(d.getYearData(), d.getIter(), json, names);
+                    return BCalcMapper.fromCalcJson(cr.getId(),d.getYearData(), d.getIter(), json, names);
                 })
                 .filter(Objects::nonNull)
                 .toList();
@@ -223,7 +223,7 @@ public class BService {
                         if (cr == null) return null;
                         CalcResultName names = cr.getLabels();
                         Map<String, Object> json = cr.getCalcParams();
-                        return BCalcMapper.fromCalcJson(d.getYearData(), d.getIter(), json, names);
+                        return BCalcMapper.fromCalcJson(cr.getId(), d.getYearData(), d.getIter(), json, names);
                     })
                     .filter(Objects::nonNull)
                     .toList();

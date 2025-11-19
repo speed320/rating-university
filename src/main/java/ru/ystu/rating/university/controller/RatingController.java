@@ -27,10 +27,9 @@ public class RatingController {
     /**
      * Создать новую итерацию для пользователя, сохранить параметры по
      * всем переданным классам (A/B/V) и выполнить расчёт.
-     * <p>
-     * Сейчас реально считается только класс B — A и V заглушки.
-     * <p>
-     * userId - SecurityContext
+     *
+     * @param principal
+     * @param request
      */
     @PostMapping("/calc-multi")
     @Operation(
@@ -48,6 +47,8 @@ public class RatingController {
     /**
      * Получение истории по всем итерациям и классам (A/B/V) для
      * конкретного пользователя
+     *
+     * @param principal
      */
     @GetMapping("/history")
     @Operation(summary = "История по всем классам A/B/V для пользователя")
@@ -59,29 +60,19 @@ public class RatingController {
     }
 
     /**
-     * Экспорт последнего состояния параметров по всем классам.
-     * Сейчас реально экспортируются только параметры класса B
-     * из последней итерации пользователя.
+     * Очистка текущих расчетов по всем классам (A/B/V) у конкретного пользователя
+     * @param principal
      */
-    @GetMapping("/export-params")
-    @Operation(
-            summary = "Экспорт последних параметров по всем классам",
-            description = "Возвращает структуру MultiClassParamsRequestDto; " +
-                    "пока реализован только класс B"
-    )
-    public MultiClassParamsRequestDto exportParams(
-            @AuthenticationPrincipal CustomUserDetails principal
-    ) {
-        Long userId = principal.getId();
-        return ratingService.exportParams(userId);
-    }
-
     @PostMapping("/clear-current")
     @Operation(summary = "Очистить текущие данные пользователя по всем классам (но не удалять историю)")
     public void clearCurrent(@AuthenticationPrincipal CustomUserDetails principal) {
         ratingService.clearCurrentForUser(principal.getId());
     }
 
+    /**
+     * Очистка истории расчетов у конкретного пользователя
+     * @param principal
+     */
     @DeleteMapping("/history")
     @Operation(summary = "Удалить всю историю расчётов пользователя")
     public void clearHistory(@AuthenticationPrincipal CustomUserDetails principal) {

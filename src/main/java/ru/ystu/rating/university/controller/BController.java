@@ -30,8 +30,8 @@ public class BController {
     /**
      * Получить последние введённые параметры класса B
      * (последняя итерация для данного пользователя).
-     * <p>
-     * userId - SecurityContext,
+     *
+     * @param principal
      */
     @GetMapping("/params/last")
     @Operation(summary = "Получить последние введённые параметры класса B (последняя итерация)")
@@ -44,6 +44,8 @@ public class BController {
 
     /**
      * Получить рассчитанные значения по классу B за последнюю итерацию пользователя.
+     *
+     * @param principal
      */
     @GetMapping("/calc/last")
     @Operation(summary = "Получить последние расчёты класса B (последняя итерация)")
@@ -56,6 +58,8 @@ public class BController {
 
     /**
      * История по классу B: все итерации пользователя.
+     *
+     * @param principal
      */
     @GetMapping("/history")
     @Operation(summary = "Получить историю расчётов класса B (все итерации)")
@@ -68,6 +72,8 @@ public class BController {
 
     /**
      * Обновление названий метрик для одного результата (B11/B12/B13/B21).
+     *
+     * @param dto
      */
     @PutMapping("/metric-names")
     @Operation(summary = "Обновить названия метрик B11/B12/B13/B21 для конкретного результата")
@@ -75,6 +81,13 @@ public class BController {
         bService.updateMetricNames(dto);
     }
 
+    /**
+     * Получение параметров класса B для определённой итерации
+     *
+     * @param principal
+     * @param iter
+     * @return
+     */
     @GetMapping("/params/iter/{iter}")
     @Operation(summary = "Получить введённые параметры класса B для заданной итерации")
     public ClassParamsBlockDto getParamsForBIter(

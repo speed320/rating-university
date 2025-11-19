@@ -1,6 +1,7 @@
 package ru.ystu.rating.university.dto;
 
 public record BCalcDto(
+        Long calcResultId,
         Integer year,
         Integer iteration,
         double b11,
