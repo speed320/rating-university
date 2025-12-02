@@ -55,6 +55,7 @@ public class BMathCalculator {
         double totalB = b11 + b12 + b13 + b21;
 
         return new BCalcDto(
+                null,
                 p.year(),
                 iter,
                 b11,
@@ -62,6 +63,9 @@ public class BMathCalculator {
                 b13,
                 b21,
                 totalB,
+                "А",
+                "Б",
+                "В",
                 "B11",
                 "B12",
                 "B13",
