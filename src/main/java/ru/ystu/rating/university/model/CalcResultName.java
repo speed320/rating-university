@@ -13,6 +13,15 @@ public class CalcResultName {
     @JoinColumn(name = "calc_result_id", nullable = false, unique = true)
     private CalcResult calcResult;
 
+    @Column(name = "code_class_a", nullable = false)
+    private String codeClassA = "А";
+
+    @Column(name = "code_class_b", nullable = false)
+    private String codeClassB = "Б";
+
+    @Column(name = "code_class_v", nullable = false)
+    private String codeClassV = "В";
+
     @Column(name = "code_b11", nullable = false, length = 50)
     private String codeB11 = "B11";
 
@@ -42,6 +51,30 @@ public class CalcResultName {
 
     public void setCalcResult(CalcResult calcResult) {
         this.calcResult = calcResult;
+    }
+
+    public String getCodeClassA() {
+        return codeClassA;
+    }
+
+    public void setCodeClassA(String codeClassA) {
+        this.codeClassA = codeClassA;
+    }
+
+    public String getCodeClassB() {
+        return codeClassB;
+    }
+
+    public void setCodeClassB(String codeClassB) {
+        this.codeClassB = codeClassB;
+    }
+
+    public String getCodeClassV() {
+        return codeClassV;
+    }
+
+    public void setCodeClassV(String codeClassV) {
+        this.codeClassV = codeClassV;
     }
 
     public String getCodeB11() {

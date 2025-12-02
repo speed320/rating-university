@@ -180,7 +180,7 @@ public class BService {
                     if (cr == null) return null;
                     CalcResultName names = cr.getLabels();
                     Map<String, Object> json = cr.getCalcParams();
-                    return BCalcMapper.fromCalcJson(d.getYearData(), d.getIter(), json, names);
+                    return BCalcMapper.fromCalcJson(cr.getId(), d.getYearData(), d.getIter(), json, names);
                 })
                 .filter(Objects::nonNull)
                 .toList();
@@ -223,7 +223,7 @@ public class BService {
                         if (cr == null) return null;
                         CalcResultName names = cr.getLabels();
                         Map<String, Object> json = cr.getCalcParams();
-                        return BCalcMapper.fromCalcJson(d.getYearData(), d.getIter(), json, names);
+                        return BCalcMapper.fromCalcJson(cr.getId(), d.getYearData(), d.getIter(), json, names);
                     })
                     .filter(Objects::nonNull)
                     .toList();
@@ -250,6 +250,9 @@ public class BService {
                     return n;
                 });
 
+        names.setCodeClassA(dto.codeClassA());
+        names.setCodeClassB(dto.codeClassB());
+        names.setCodeClassV(dto.codeClassV());
         names.setCodeB11(dto.codeB11());
         names.setCodeB12(dto.codeB12());
         names.setCodeB13(dto.codeB13());

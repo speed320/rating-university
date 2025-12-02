@@ -77,6 +77,9 @@ CREATE TABLE IF NOT EXISTS calc_result (
 CREATE TABLE IF NOT EXISTS calc_result_name (
     id             BIGSERIAL   PRIMARY KEY,
     calc_result_id BIGINT NOT NULL UNIQUE,
+    code_class_a   VARCHAR(50) NOT NULL DEFAULT 'А',
+    code_class_b   VARCHAR(50) NOT NULL DEFAULT 'Б',
+    code_class_v   VARCHAR(50) NOT NULL DEFAULT 'В',
     code_b11       VARCHAR(50) NOT NULL DEFAULT 'B11',
     code_b12       VARCHAR(50) NOT NULL DEFAULT 'B12',
     code_b13       VARCHAR(50) NOT NULL DEFAULT 'B13',
