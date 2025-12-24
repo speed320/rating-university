@@ -4,6 +4,7 @@ import java.util.List;
 
 public record ClassParamsBlockDto(
         String classType,
-        List<BParamsDto> data
+        List<BParamsDto> data,
+        BMetricNamesDto names
 ) {
 }

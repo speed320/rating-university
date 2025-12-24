@@ -1,5 +1,6 @@
 package ru.ystu.rating.university.service;
 
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.ystu.rating.university.dto.*;
@@ -56,7 +57,7 @@ public class BService {
      * @return список рассчитанных BCalcDto по годам
      */
     @Transactional
-    public List<BCalcDto> saveParamsAndComputeForB(AppUser user, int iter, List<BParamsDto> yearParams) {
+    public List<BCalcDto> saveParamsAndComputeForB(AppUser user, int iter, List<BParamsDto> yearParams, BMetricNamesDto namesDto) {
         if (yearParams == null || yearParams.isEmpty()) {
             return List.of();
         }
@@ -87,9 +88,18 @@ public class BService {
             cr.setCalcParams(BCalcMapper.toCalcJson(calcDto));
             calcRepo.save(cr);
 
-            CalcResultName names = new CalcResultName();
-            names.setCalcResult(cr);
-            namesRepo.save(names);
+            if(namesDto != null){
+                CalcResultName names = new CalcResultName();
+                names.setCalcResult(cr);
+                names.setCodeClassA(namesDto.codeClassA());
+                names.setCodeClassB(namesDto.codeClassB());
+                names.setCodeClassV(namesDto.codeClassV());
+                names.setCodeB11(namesDto.codeB11());
+                names.setCodeB12(namesDto.codeB12());
+                names.setCodeB13(namesDto.codeB13());
+                names.setCodeB21(namesDto.codeB21());
+                namesRepo.save(names);
+            }
 
             result.add(calcDto);
         }
@@ -111,7 +121,7 @@ public class BService {
                 .map(UserIterState::getCurrentIter)
                 .orElse(null);
         if (currentIterB == null || currentIterB == 0) {
-            return new ClassParamsBlockDto("B", List.of());
+            return new ClassParamsBlockDto("B", List.of(), null);
         }
 
         List<Data> rows = dataRepo.findAllByAppUserAndClassTypeAndIterOrderByYearDataAsc(
@@ -125,7 +135,7 @@ public class BService {
                 })
                 .toList();
 
-        return new ClassParamsBlockDto("B", dtoList);
+        return new ClassParamsBlockDto("B", dtoList, null);
     }
 
     @Transactional(readOnly = true)
@@ -139,7 +149,7 @@ public class BService {
         );
 
         if (rows.isEmpty()) {
-            return new ClassParamsBlockDto("B", List.of());
+            return new ClassParamsBlockDto("B", List.of(), null);
         }
 
         List<BParamsDto> dtoList = rows.stream()
@@ -149,7 +159,7 @@ public class BService {
                 })
                 .toList();
 
-        return new ClassParamsBlockDto("B", dtoList);
+        return new ClassParamsBlockDto("B", dtoList, null);
     }
 
 

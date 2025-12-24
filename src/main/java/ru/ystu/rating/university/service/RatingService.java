@@ -64,11 +64,13 @@ public class RatingService {
                     case "B" -> {
                         @SuppressWarnings("unchecked")
                         List<BParamsDto> bParams = (List<BParamsDto>) (List<?>) block.data();
+                        BMetricNamesDto names = block.names();
 
                         List<BCalcDto> bResults = bService.saveParamsAndComputeForB(
                                 user,
                                 nextIter,
-                                bParams
+                                bParams,
+                                names
                         );
                         resultBlocks.add(new ClassCalcBlockDto("B", bResults));
                     }
